@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <!--  헤더영역 가져오기  -->
+    <th:block th:insert="~{th/fragments/header::headerFragment}">
+
+    </th:block>
+    <main>
+        <h1>TEST1 (/th/test1)</h1>
+
+        <h2>TH : 속성값 가져오기</h2>
+        NAME : <span th:text="${name}"> </span> <br/>
+        DTO : <span th:text="${dto}"> </span> <br/>
+        DTO.ID : <span th:text="${dto.id}"> </span> <br/>
+        DTO.TEXT : <span th:text="${dto.text}"> </span> <br/>
+        DTO.WRITER : <span th:text="${dto.writer}"> </span> <br/>
+        <hr/>
+        <h2>TH : 분기문</h2>
+        <th:block th:if="${isAuth}">
+            <div> 로그인 상태입니다</div>
+        </th:block>
+        <th:block th:unless="${isAuth}">
+            <div> 로그아웃 상태입니다</div>
+        </th:block>
+
+        <hr/>
+        <h2>TH : 반복문</h2>
+        <th:block th:each="dto:${list}">
+            <div th:text="${dto}"></div>
+        </th:block>
+        <hr/>
+        <h2>TH : A TAG</h2>
+        <a th:href="@{/memo/param1(id=${dto.id},text=${dto.text},writer=${dto.writer})}">/MEMO/PARAM1</a> <br/>
+        <a th:href="@{/memo/param2/{id}/{text}/{writer}(id=${dto.id},text=${dto.text},writer=${dto.writer})   }">/MEMO/PARAM2</a> <br/>
+
+        <script th:inline="javascript">
+            const name = [[ ${name} ]]
+            console.log('name',name)
+
+            const dto = [[ ${dto} ]]
+            console.log('dto',dto)
+
+            const list = [[ ${list} ]]
+            console.log('list',list)
+        </script>
+    </main>
+
+
+    <!--  헤더영역 가져오기  -->
+    <div th:insert="~{th/fragments/footer::footerFragment-1}"> </div>
+    <div th:replace="~{th/fragments/footer::footerFragment-2}"> </div>
+
+
+</body>
+</html>

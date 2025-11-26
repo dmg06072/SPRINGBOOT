@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <!-- JQUERY CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        // console.log($.ajax);
+
+        // GET 목록(강사컴 : 192.168.5.4)
+        // $.ajax({
+        //     url: "http://localhost:8099/api/items/5",
+        //     method: "GET",
+        // }).done((resp)=>{console.log(resp)}).fail((error)=>{console.log(error)});
+
+        // // POST 생성
+        $.ajax({
+            url: "http://localhost:8099/api/items",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ name: "아무거나", price: 101000 })
+        }).done(console.log);
+
+        // // PUT 전체수정
+        // $.ajax({
+        //     url: "http://localhost:8099/api/items/1",
+        //     method: "PUT",
+        //     contentType: "application/json",
+        //     data: JSON.stringify({ name: "pen-2", price: 700 })
+        // }).done(console.log);
+
+        // // PATCH 부분수정
+        // $.ajax({
+        //     url: "http://localhost:8099/api/items/1",
+        //     method: "PATCH",
+        //     contentType: "application/json",
+        //     data: JSON.stringify({ price: 750 })
+        // }).done(console.log);
+
+        // // DELETE 삭제
+        // $.ajax({
+        //     url: "http://localhost:8099/api/items/1",
+        //     method: "DELETE"
+        // }).done(() => console.log("deleted"));
+
+    </script>
+</body>
+
+</html>

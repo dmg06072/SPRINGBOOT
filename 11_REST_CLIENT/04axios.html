@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <!-- AXIOS CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js"
+        integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        // console.log(axios)
+
+        // axios.요청매서드명("URL",{파라미터},{요청헤더-생략가능})
+        //     .then(성공시 콜백)
+        //     .error(에러발생시 콜백)
+
+        axios.get("http://localhost:8099/api/items/21")
+        .then(res => console.log(res.data));
+
+        // axios.post("http://localhost:8099/api/items", { name: "book", price: 1000 })
+        //     .then(res => console.log(res.data));
+
+        // axios.put("http://localhost:8099/api/items/1", { name: "book-v2", price: 1200 });
+
+        // axios.patch("http://localhost:8099/api/items/1", { price: 1300 });
+
+        // axios.delete("http://localhost:8099/api/items/1")
+        //     .then(() => console.log("deleted"));
+    </script>
+</body>
+
+</html>

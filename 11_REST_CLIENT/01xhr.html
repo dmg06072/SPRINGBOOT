@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+
+    <script>
+        const xhr = new XMLHttpRequest;
+        console.log(xhr)
+        xhr.open("POST","http://192.168.5.4:8099/api/items");
+        xhr.setRequestHeader("Content-Type","application/json")
+        xhr.onload = ()=>{ console.log("정상응답 : ",xhr.responseText);  }  //정상응답 처리
+        xhr.onerror = ()=>{console.log("요청 실패!")}                   //비정상응답 처리
+        xhr.send( JSON.stringify({ name: "pen", price: 500 }) );
+        
+        function get_item(id) {}
+        function post_item(item) {}
+        function put_item(item) {}
+        function petch_item(item) {}
+        function delete_item(id) {}
+
+
+        // 기본코드
+        // const xhr = new XMLHttpRequest();
+        // xhr.open("POST", "http://localhost:8080/api/items");
+        // xhr.setRequestHeader("Content-Type", "application/json");
+        // xhr.onload = function () {
+        //     console.log("응답:", xhr.responseText);
+        // };
+        // xhr.onerror = function () {
+        //     console.error("요청 실패!");
+        // };
+        // xhr.send(JSON.stringify({ name: "pen", price: 500 }));
+        // open(메서드, 주소) → 요청 준비
+
+        // setRequestHeader → JSON 전송 시 헤더 설정
+        // onload → 성공 응답 처리
+        // onerror → 네트워크 오류 처리
+        // send(데이터) → 요청 보내기
+
+    </script>
+</body>
+
+</html>
