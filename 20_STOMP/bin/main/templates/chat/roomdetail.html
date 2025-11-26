@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>채팅방: <span th:text="${room.roomName}"></span></title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2/lib/stomp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .header {
+            background: #141414;
+            color: #ffffff;
+            padding: 20px 40px;
+            border-bottom: 1px solid #2a2a2a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-info h1 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            letter-spacing: -0.3px;
+        }
+        
+        .header-info p {
+            font-size: 12px;
+            color: #666;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .btn-back {
+            background: transparent;
+            color: #ffffff;
+            padding: 10px 20px;
+            border: 1px solid #2a2a2a;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-back:hover {
+            background: #ffffff;
+            color: #0f0f0f;
+            border-color: #ffffff;
+        }
+        
+        .user-info {
+            padding: 20px 40px;
+            background: #141414;
+            border-bottom: 1px solid #2a2a2a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .user-info input {
+            padding: 10px 14px;
+            border: 1px solid #2a2a2a;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            font-size: 14px;
+            width: 200px;
+        }
+        
+        .user-info input:focus {
+            outline: none;
+            border-color: #ffffff;
+            background: #1a1a1a;
+        }
+        
+        .user-info input::placeholder {
+            color: #666;
+        }
+        
+        .user-info input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid;
+        }
+        
+        .status.connected {
+            background: transparent;
+            color: #4caf50;
+            border-color: #4caf50;
+        }
+        
+        .status.disconnected {
+            background: transparent;
+            color: #f44336;
+            border-color: #f44336;
+        }
+        
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 40px;
+            background: #0f0f0f;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            animation: fadeIn 0.2s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .message.system {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            padding: 12px;
+            border: 1px solid #2a2a2a;
+            background: #141414;
+        }
+        
+        .message.user {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message.user.sent {
+            align-items: flex-end;
+        }
+        
+        .message.user.received {
+            align-items: flex-start;
+        }
+        
+        .message-header {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 6px;
+            padding: 0 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .message-bubble {
+            max-width: 65%;
+            padding: 12px 16px;
+            word-wrap: break-word;
+            border: 1px solid;
+        }
+        
+        .message.user.sent .message-bubble {
+            background: #ffffff;
+            color: #0f0f0f;
+            border-color: #ffffff;
+        }
+        
+        .message.user.received .message-bubble {
+            background: #141414;
+            color: #e0e0e0;
+            border-color: #2a2a2a;
+        }
+        
+        .input-area {
+            padding: 20px 40px;
+            background: #141414;
+            border-top: 1px solid #2a2a2a;
+            display: flex;
+            gap: 0;
+        }
+        
+        .input-area input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 1px solid #2a2a2a;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+        
+        .input-area input:focus {
+            outline: none;
+            border-color: #ffffff;
+            background: #1a1a1a;
+        }
+        
+        .input-area input::placeholder {
+            color: #666;
+        }
+        
+        .input-area input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border: 1px solid #2a2a2a;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .btn-primary {
+            background: #ffffff;
+            color: #0f0f0f;
+            border-color: #ffffff;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: #e0e0e0;
+            border-color: #e0e0e0;
+        }
+        
+        .btn-send {
+            background: #ffffff;
+            color: #0f0f0f;
+            border-color: #ffffff;
+        }
+        
+        .btn-send:hover:not(:disabled) {
+            background: #e0e0e0;
+            border-color: #e0e0e0;
+        }
+        
+        .btn-quit {
+            background: transparent;
+            color: #f44336;
+            border-color: #f44336;
+        }
+        
+        .btn-quit:hover:not(:disabled) {
+            background: #f44336;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <h1 th:text="${room.roomName}">채팅방</h1>
+                <p>ID: <span th:text="${room.roomId}"></span></p>
+            </div>
+            <a href="/chat/room" class="btn-back">← Back</a>
+        </div>
+        
+        <div class="user-info">
+            <input type="text" id="sender" placeholder="Enter your name" th:value="'User' + ${T(java.lang.Math).random() * 1000}">
+            <button class="btn btn-primary" onclick="connect()">Connect</button>
+            <button class="btn btn-quit" onclick="disconnect()" disabled id="btnDisconnect">Quit</button>
+            <span class="status disconnected" id="status">Disconnected</span>
+        </div>
+        
+        <div class="chat-area" id="chatArea">
+            <div class="message system">
+                Welcome to the chat room. Enter your name and click Connect to start.
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="message" placeholder="Type your message..." onkeypress="handleKeyPress(event)" disabled>
+            <button class="btn btn-send" onclick="sendMessage()" disabled id="btnSend">Send</button>
+        </div>
+    </div>
+    
+    <script th:inline="javascript">
+        const roomId = /*[[${room.roomId}]]*/ '';
+        let stompClient = null;
+        let sender = '';
+        
+        // WebSocket 연결
+        function connect() {
+            sender = document.getElementById('sender').value.trim();
+            if (!sender) {
+                alert('Please enter your name.');
+                return;
+            }
+            
+            // SockJS와 STOMP를 사용하여 서버에 연결
+            const socket = new SockJS('/ws-stomp');
+            stompClient = Stomp.over(socket);
+            
+            // 디버그 모드 비활성화 (콘솔 로그 최소화)
+            stompClient.debug = function(str) {
+                // 필요시 console.log(str);
+            };
+            
+            // 연결 시도
+            stompClient.connect({}, function(frame) {
+                console.log('Connected: ' + frame);
+                
+                // 채팅방 구독
+                // 설명 4.2: /sub/chat/room/{roomId}를 구독(SUBSCRIBE)
+                stompClient.subscribe('/sub/chat/room/' + roomId, function(message) {
+                    const chatMessage = JSON.parse(message.body);
+                    displayMessage(chatMessage);
+                });
+                
+                // 설명 4.2: ENTER 메시지 전송 (입장)
+                sendEnterMessage();
+                
+                // UI 업데이트
+                updateConnectionStatus(true);
+            }, function(error) {
+                console.error('Connection error: ', error);
+                alert('Connection failed.');
+            });
+        }
+        
+        // WebSocket 연결 해제
+        // 설명 4.4: QUIT 메시지 전송 후 연결 해제(DISCONNECT)
+        function disconnect() {
+            if (stompClient !== null) {
+                // QUIT 메시지 전송 (퇴장)
+                sendQuitMessage();
+                
+                // 설명 4.4: 이후 연결을 해제(DISCONNECT)
+                stompClient.disconnect();
+            }
+            updateConnectionStatus(false);
+            console.log("Disconnected");
+        }
+        
+        // 메시지 전송
+        function sendMessage() {
+            const messageInput = document.getElementById('message');
+            const message = messageInput.value.trim();
+            
+            if (!message) {
+                return;
+            }
+            
+            if (stompClient !== null && stompClient.connected) {
+                const chatMessage = {
+                    type: 'TALK',
+                    roomId: roomId,
+                    sender: sender,
+                    message: message
+                };
+                
+                // 설명 4.3: /pub/chat/message로 type: TALK로 발행(SEND)
+                stompClient.send("/pub/chat/message", {}, JSON.stringify(chatMessage));
+                messageInput.value = '';
+            }
+        }
+        
+        // ENTER 메시지 전송 (입장)
+        // 설명 4.2: /pub/chat/message로 type: ENTER 메시지를 발행(SEND)
+        function sendEnterMessage() {
+            if (stompClient !== null && stompClient.connected) {
+                const chatMessage = {
+                    type: 'ENTER',
+                    roomId: roomId,
+                    sender: sender,
+                    message: ''
+                };
+                
+                stompClient.send("/pub/chat/message", {}, JSON.stringify(chatMessage));
+            }
+        }
+        
+        // QUIT 메시지 전송 (퇴장)
+        // 설명 4.4: /pub/chat/message로 type: QUIT 메시지를 발행(SEND)
+        function sendQuitMessage() {
+            if (stompClient !== null && stompClient.connected) {
+                const chatMessage = {
+                    type: 'QUIT',
+                    roomId: roomId,
+                    sender: sender,
+                    message: ''
+                };
+                
+                stompClient.send("/pub/chat/message", {}, JSON.stringify(chatMessage));
+            }
+        }
+        
+        // 메시지 표시
+        function displayMessage(chatMessage) {
+            const chatArea = document.getElementById('chatArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            
+            if (chatMessage.type === 'ENTER' || chatMessage.type === 'QUIT') {
+                // 시스템 메시지 (입장/퇴장)
+                messageDiv.className += ' system';
+                messageDiv.textContent = chatMessage.message;
+            } else {
+                // 일반 메시지
+                const isSent = chatMessage.sender === sender;
+                messageDiv.className += ' user ' + (isSent ? 'sent' : 'received');
+                
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'message-header';
+                headerDiv.textContent = chatMessage.sender;
+                
+                const bubbleDiv = document.createElement('div');
+                bubbleDiv.className = 'message-bubble';
+                bubbleDiv.textContent = chatMessage.message;
+                
+                messageDiv.appendChild(headerDiv);
+                messageDiv.appendChild(bubbleDiv);
+            }
+            
+            chatArea.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+        
+        // 연결 상태 UI 업데이트
+        function updateConnectionStatus(connected) {
+            const status = document.getElementById('status');
+            const btnSend = document.getElementById('btnSend');
+            const btnDisconnect = document.getElementById('btnDisconnect');
+            const messageInput = document.getElementById('message');
+            const senderInput = document.getElementById('sender');
+            
+            if (connected) {
+                status.textContent = 'Connected';
+                status.className = 'status connected';
+                btnSend.disabled = false;
+                btnDisconnect.disabled = false;
+                messageInput.disabled = false;
+                senderInput.disabled = true;
+                messageInput.focus();
+            } else {
+                status.textContent = 'Disconnected';
+                status.className = 'status disconnected';
+                btnSend.disabled = true;
+                btnDisconnect.disabled = true;
+                messageInput.disabled = true;
+                senderInput.disabled = false;
+            }
+        }
+        
+        // Enter 키로 메시지 전송
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        // 페이지를 떠날 때 연결 해제
+        window.addEventListener('beforeunload', function() {
+            disconnect();
+        });
+    </script>
+</body>
+</html>
