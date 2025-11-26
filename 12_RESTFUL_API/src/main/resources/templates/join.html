@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        /* common */
+        *{
+            font-size:0.9rem;
+            box-sizing: border-box;
+        }
+        a{
+          text-decoration: none;
+          color:black;    
+        }
+        body{
+            margin : 0;
+            padding : 0;
+        }
+        .btn{
+           border:1px solid gray;
+           min-width:80px; 
+           height:100%;
+           line-height:35px;
+           text-align:center;
+           font-size:0.8rem;
+        }
+        .btn-submit{
+            width:100%;
+            background-color: royalblue;
+            color:white;
+            border : 0;
+        }
+
+
+        /* form */
+        form{
+            width:380px;
+            border:1px solid;
+            margin : 50px auto;
+        }
+        form>.row{
+         margin:10px;
+         display:flex;
+         justify-content: left;
+         align-items: center;
+         gap:5px;
+         height:35px;
+        }
+        form>.row>label{
+            display:block;
+            min-width:85px;
+            height:100%;
+            line-height:35px;
+            /* border : 1px solid; */
+        }
+        form>.row>input[type="text"],
+        form>.row>input[type="password"],
+        form>.row>select
+        {
+            height:100%;
+            width:100%;
+            outline : none;
+            border-radius: 0;
+            border : 1px solid gray;
+        }
+
+
+        .top-header{
+            height:15px !important;
+            background-color: black !important;
+        }
+        .title{
+            margin-bottom:25px !important;
+
+        }
+        .title>h1{
+            width:100%;
+            text-align: center;
+            font-size:2rem;
+            border-bottom:1px solid lightgray;
+            padding-bottom:5px;
+        }
+        
+    </style>
+
+
+</head>
+
+<body>
+
+
+    <!--  -->
+    <form action="/test.jsp" method="post" name="joinForm">
+        <div class="row top-header">
+
+        </div>
+        <div class="row title">
+            <h1>회원가입</h1>
+        </div>
+        <div class="row">
+            <label>아이디</label>
+            <input  name="userid"   type="text"  />
+            <a class="btn cert-btn"  href="javascript:void(0)">본인인증</a>
+        </div>
+        <div class="row">
+            <label>비밀번호</label>
+            <input name="password" type="password" />
+        </div>
+        <div class="row">
+            <label>비밀번호 확인</label>
+            <input name="re-password" type="password" />
+        </div>
+        <div class="row">
+            <label>이름</label>
+            <input name="username" type="text" />
+        </div>
+        <div class="row">
+            <label>우편번호</label>
+            <input name="zipcode" type="text" />
+            <a class="btn zip-btn" href="javascript:void(0)">검색</a>
+        </div>
+        <div class="row">
+            <label>기본주소</label>
+            <input name="addr1" type="text" />
+        </div>
+        <div class="row">
+            <label>상세주소</label>
+            <input name="addr2" type="text" />
+        </div>
+        <div class="row">
+            <label>휴대전화</label>
+            <select>
+                <option value="" selected>010</option>
+                <option value="">011</option>
+            </select>
+            <input type="text" />
+            <input type="text" />
+        </div>
+        <div class="row">
+            <label>연락처</label>
+            <select>
+                <option value="" selected>053</option>
+                <option value="">055</option>
+                <option value="">02</option>
+            </select>
+            <input type="text" />
+            <input type="text" />
+        </div>
+        <div class="row">
+            <label>이메일</label>
+            <input type="text" />
+            <select>
+                <option value="" selected>@naver.com</option>
+                <option value="">@outlook.co.kr</option>
+                <option value="">@google.com</option>
+            </select>
+        </div>
+        <div class="row">
+            <label>생년월일</label>
+            <input name="birth" type="radio" /> 양
+            <input name="birth" type="radio" /> 음
+        </div>
+        
+        <div class="row">
+            <select>
+                <option value="" selected>2025</option>
+                <option value="">2024</option>
+                <option value="">2023</option>
+            </select>
+            <select>
+                <option value="" selected>12</option>
+                <option value="">11</option>
+                <option value="">10</option>
+            </select>
+            <select>
+                <option value="" selected>01</option>
+                <option value="">02</option>
+                <option value="">03</option>
+            </select>
+        </div>
+        <hr/>
+        <div class="row">
+            <input id="email-recv" type="checkbox" /> 
+            <label for="email-recv">이메일 수신에 동의합니다.</label>
+        </div>
+        <div class="row">
+            <input id="sms-recv" type="checkbox" /> 
+            <label for="sms-recv">문자메시지 수신에 동의합니다.</label>
+        </div>
+        <div class="row">
+            <input class="btn btn-submit" type="submit" value="회원가입" />
+        </div>
+
+    </form>
+
+
+    <!--  axios cdn   -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.10.0/axios.min.js" integrity="sha512-WkZrEcQ5LMyNy6Y2PQf+Tu3vMcsmKKRKuPXtJSTHQJ3mpuvLRlA5dlDDhrrcXfyWr6Z/y3wIMfjfqVFO/gDZYQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+    <script>
+        IMP.init("imp87380722");
+
+        const certBtn = document.querySelector('.cert-btn');
+        certBtn.addEventListener('click',()=>{
+            console.log('certBtn clicked...');
+
+            const date = new Date();
+
+            IMP.certification({
+                channelKey: "channel-key-46e93c96-d412-4f15-801d-3e28ed701185",
+                merchant_uid: "test_"+date.toString(),
+            }, function (resp){
+                console.log(resp);
+                const imp_uid = resp.imp_uid;
+                //비동기 요청(axios)
+                axios.get("/portOne/certifications/"+imp_uid)
+                .then((resp_2)=>{
+                    console.log("사용자 정보 조회" , resp_2)
+                    resp_data = resp_2.data.response;
+                    const birthday =resp_data.birthday.split('-'); //['yyyy','MM','dd']
+                    const name = resp_data.name;
+                    let phone = resp_data.phone; // 01023753058
+                    const part1 =phone.slice(0,3); //010
+                    phone = phone.slice(3,phone.length) //23753058
+                    const part3 =phone.slice(-4); //3058
+                    const part2 = phone.slice(0,-4); // 23753058
+                    console.log(birthday);
+                    console.log(name);
+                    console.log(part1,part2,part3);
+                    //요소 찾아서 연결
+                    const form = document.joinForm;
+                    form.username.value = name;
+                })
+                .error(()=>{})
+            });
+
+        })
+    </script>
+
+
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script>
+
+        //zip-btn
+        const zipBtn = document.querySelector('.zip-btn');
+        zipBtn.addEventListener('click',()=>{
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    console.log(data);
+                    // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분입니다.
+                    // 예제를 참고하여 다양한 활용법을 확인해 보세요.
+                }
+            }).open();
+        });
+
+    </script>
+
+</body>
+
+</html>

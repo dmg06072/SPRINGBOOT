@@ -1,0 +1,24 @@
+1 FC - INIT - https://fullcalendar.io/docs/initialize-globals
+2 DateCliekEventHadler - https://fullcalendar.io/docs/dateClick
+3 google calendar 연동 - https://console.cloud.google.com/
+			1) 프로젝트 생성
+			2) 사이드메뉴 -> API 및 서비스 -> 사용 설정된 API 및 서비스 -> calendar 검색 ->사용
+		      	3) 사이드메뉴 -> API 및 서비스 -> API 키 -> 웹싸이트, Calendar API 키제한 -> Key발급
+		     - 크롬 -> 우측상단 메뉴 -> 구글 calendar -> 캘린더 추가 -> 옵션 -> 설정 및 공유
+			  -> 공개사용설정 체크 -> 캘린더 ID 확인
+
+		     - FULLCALENDAR + google CAL Event 연동
+
+4 FULLCALENDAR's Doc EventHandler 추가 - 기본기능 제거
+-https://fullcalendar.io/docs/eventClick
+
+5 Post
+	- GOOGLE CLOUD -
+	5-1) GOOGLE OAuth 설정 -> 패스워드.json 다운로드
+	5-2) Redirect URL 설정
+	5-3) 테스트앱 사용자추가
+
+	- SPRING BOOT -
+	5-4) build.gradle
+	5-5) GoogleCalendar.java (일정 등록 삭제 인증)
+	5-6) Post /google/cal 구현

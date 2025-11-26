@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <a>로그아웃-1</a> <br/>
+    <a>로그아웃-2</a> <br/>
+    <a>로그아웃-3</a> <br/>
+    <hr/>
+    <h1>KAKAO INDEX PAGE</h1>
+    <div th:text="${profile.id}"></div>
+    <div th:text="${profile.connected_at}"></div>
+    <div th:text="${profile.properties}"></div>
+    <hr/>
+
+    <div th:text="${nickname}"></div>
+    <div th:text="${image_url}"></div>
+    <div th:text="${email}"></div>
+    <hr/>
+    <img th:src="@{{url}(url=${image_url})}" />
+
+</body>
+</html>

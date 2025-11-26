@@ -1,0 +1,229 @@
+<html>
+
+<head>
+	<!-- Mobile 화면 : Viewport 설정 -->
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="viewport"
+		content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width">
+	<meta name="robots" content="noindex">
+	<meta name="format-detection" content="telephone=no">
+	<!--STEP 1: CSS 추가하기 -->
+	<!--CDN 방식 -->
+	<!--<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css"/>-->
+	<!-- Download 방식 -->
+	<link rel="stylesheet" href="/css/leaflet@1.3.3/leaflet.css" />
+	<!--STEP 3: 지도 영역 관련 CSS 추가하기 -->
+	<link rel="stylesheet" href="/css/main.css" />
+	<!--STEP 2: JS 추가하기 -->
+	<!--CDN 방식 -->
+	<!--<script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js"></script>-->
+	<!-- Download 방식 -->
+	<script src="/js/leaflet@1.3.3/leaflet.js"></script>
+	<!-- Leaflet Plugins: Leaflet.KoreanTmsProviders 추가  -->
+	<script src="/js/KoreanTmsProviders/lib/proj4.js"></script>
+	<script src="/js/KoreanTmsProviders/lib/proj4leaflet.js"></script>
+	<script src="/js/KoreanTmsProviders/src/Leaflet.KoreanTmsProviders.js"></script>
+
+
+	<!-- 클러스터링 -->
+	<!-- leaflet.markercluster CDN -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+	<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+	<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+</head>
+
+<body>
+	<!-- 배경지도 영역 추가하기-->
+	<div id="map" class="map"></div>
+	<script>
+		var map = new L.Map('map', {
+			center: new L.LatLng(35.871645, 128.601494), //중심점 : 김천 위경도 좌표
+			zoom: 12,	//Leaflet.KoreanTmsProviders.js : resolutions기준 줌 레벨(Level 12)
+			crs: L.Proj.CRS.Daum, //Leaflet.KoreanTmsProviders.js : 새로 정의된 Daum Map CRS
+			worldCopyJump: false,  //https://leafletjs.com/reference-1.3.2.html#map-worldcopyjump 참조    
+		});
+		var baseLayers = L.tileLayer.koreaProvider('DaumMap.Street').addTo(map);
+
+
+		//-------------------------------------
+		// 중심좌표 마커 생성  (대구광역시청)
+		//-------------------------------------
+		//마커생성
+		var marker1 = L.marker([35.871410, 128.601800]).addTo(map);
+		marker1.bindPopup("대구광역시청").openPopup(); // 팝업 표시
+
+		// 커스텀 이미지 
+		var customIcon = L.icon({
+			iconUrl: '/marker-image2.png',			//  아이콘 경로
+			iconSize: [48, 48],		//	아이콘 크기[가로,세로]
+			iconAnchor: [25, 0],	// 	마커 기준점(하단 중앙)
+			pipupAnchor: [0, 0]	//	팝업 위치 조정
+		})
+		// 커스텀 마커
+		var customMarker = L.marker([35.872410, 128.601800], { icon: customIcon }).addTo(map);
+
+		// 팝업창 설정
+		customMarker.bindPopup(`<div style='width:150px;height:20px'>HOVER POPUP TEST</div>`);
+
+		// Hover이벤트시  처리
+		customMarker.on('mouseover', (e) => {
+			customMarker.openPopup()
+		})
+		customMarker.on('mouseout', (e) => {
+			customMarker.closePopup();
+		})
+
+		// 마커 클릭 이벤트 처리
+		customMarker.on('click', (e) => {
+			console.log('clicked..', e)
+		})
+
+		//우클릭 마우스 이동
+		// 상태 변수
+		let isFollowing = false;
+		// 마우스 움직일 때 따라다니는 로직
+		function onMouseMove(e) {
+			if (isFollowing) {
+				customMarker.setLatLng(e.latlng);
+			}
+
+		}
+
+		// 마커 우클릭 이벤트 등록
+		customMarker.on('contextmenu', function (e) {
+			if (!isFollowing) {
+				// 마커가 마우스를 따라다니게 설정
+				isFollowing = true;
+				map.on('mousemove', onMouseMove);
+				customMarker.setOpacity(0.5);  // 희미하게
+				customMarker.closePopup();
+			} else {
+				// 마커 고정 및 위도/경도 표시
+				isFollowing = false;
+				map.off('mousemove', onMouseMove);
+				customMarker.setLatLng(e.latlng);
+				customMarker.setOpacity(1);  // 원래 상태로
+
+				const lat = e.latlng.lat.toFixed(6);
+				const lng = e.latlng.lng.toFixed(6);
+				customMarker.setPopupContent(`
+				<div style='width:180px;'>
+					<strong>현재 위치</strong><br>
+					위도: ${lat}<br>
+					경도: ${lng}
+				</div>
+			`);
+				customMarker.openPopup();
+			}
+		});
+
+
+		// 지도 우클릭 이벤트 등록
+		map.on('contextmenu', function (e) {
+			const lat = e.latlng.lat.toFixed(6);
+			const lng = e.latlng.lng.toFixed(6);
+
+			const loadingPopup = L.popup()
+				.setLatLng(e.latlng)
+				.setContent(`
+			<div style="width:200px; text-align:center;">
+				<div class="spinner-border text-primary" role="status" style="width:2rem; height:2rem;">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				<div style="margin-top:10px;">주소 불러오는 중...</div>
+			</div>
+		`)
+				.openOn(map);
+
+			// 역지오코딩 API 호출
+			fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+				.then(res => res.json())
+				.then(data => {
+					const address = data.display_name || '주소 정보를 불러올 수 없습니다.';
+					const encodedAddress = encodeURIComponent(address);
+					const naverSearchUrl = `https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=0&ie=utf8&query=${encodedAddress}`;
+
+					loadingPopup.setContent(`
+				<div style="width:220px;">
+					<strong>우클릭 위치 좌표</strong><br>
+					위도: ${lat}<br>
+					경도: ${lng}<br><br>
+					<strong>주소</strong><br>
+					<a href="${naverSearchUrl}" target="_blank" style="text-decoration: underline; color:blue;">
+						${address}
+					</a>
+				</div>
+			`);
+				})
+				.catch(err => {
+					console.error("주소 조회 실패:", err);
+					loadingPopup.setContent(`
+				<div style="width:200px; color:red;">
+					<strong>주소 조회 실패</strong><br>
+					위도: ${lat}<br>
+					경도: ${lng}
+				</div>
+			`);
+				});
+		});
+
+
+		//---------------------------------------
+		// [1] 랜덤 마커 생성 (클러스터링 없이 리스트 저장)
+		//---------------------------------------
+
+		const markerList = []; // 생성된 마커들을 저장할 리스트
+		const centerLat = 35.871410;
+		const centerLng = 128.601800;
+
+		function getRandomOffsetIrregular(maxOffset) {
+			const base = (Math.random() * Math.random()) * maxOffset;
+			const sign = Math.random() < 0.5 ? -1 : 1;
+			return base * sign;
+		}
+
+		for (let i = 0; i < 500; i++) {
+			const latOffset = getRandomOffsetIrregular(0.06);
+			const lngOffset = getRandomOffsetIrregular(0.06);
+			const lat = centerLat + latOffset;
+			const lng = centerLng + lngOffset;
+
+			const marker = L.marker([lat, lng]).bindPopup(`
+		<div>
+			<strong>랜덤 마커 #${i + 1}</strong><br>
+			위도: ${lat.toFixed(6)}<br>
+			경도: ${lng.toFixed(6)}
+		</div>
+	`);
+			markerList.push(marker); // 리스트에 저장만 함
+		}
+
+		//---------------------------------------
+		// [2] 클러스터링 적용 (저장된 마커 사용)
+		//---------------------------------------
+
+		/*
+			maxClusterRadius는 픽셀 단위로,
+			지도의 줌 레벨에 따라 실제 거리(m)는 달라집니다.
+			예: 줌레벨 12에서 약 500~800m
+		*/
+		const markerClusterGroup = L.markerClusterGroup({
+			maxClusterRadius: 100  // ← 클러스터링 반경 (픽셀 기준)
+		});
+
+		// 저장된 마커를 클러스터 그룹에 추가
+		markerList.forEach(marker => {
+			markerClusterGroup.addLayer(marker);
+		});
+
+		// 클러스터 그룹을 지도에 추가
+		map.addLayer(markerClusterGroup);
+
+
+
+
+	</script>
+</body>
+
+</html>

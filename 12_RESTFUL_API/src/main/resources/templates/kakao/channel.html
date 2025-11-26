@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="https://t1.kakaocdn.net/kakao_js_sdk/v1/kakao.min.js"></script>
+</head>
+<body>
+
+    <h1>KAKAO CHANNEL PAGE</h1>
+
+    <a href="javascript:void(0)" id="kakao-add-channel-button"></a>
+    <script>
+        console.log("Kakao",Kakao);
+        Kakao.init("-");
+
+        Kakao.Channel.createAddChannelButton({
+          container: '#kakao-add-channel-button',
+          channelPublicId: '_jNJUn' // 카카오톡 채널 홈 URL에 명시된 id로 설정합니다.
+        });
+    </script>
+</body>
+</html>
