@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>FILE UPLOAD PAGE</h1>
+
+    <h2>단일파일</h2>
+    <form action="/file/upload" method="post" enctype="multipart/form-data">
+        FILE : <input type="file" name="file" /> <br/>
+        <button>업로드[단일파일]</button>
+    </form>
+    <hr>
+    <h2>다중파일</h2>
+    <form action="/file/uploads" method="post" enctype="multipart/form-data">
+        FILE : <input type="file" name="files" multiple /> <br/>
+        <button>업로드[다중파일]</button>
+    </form>
+    <hr>
+    <h2>상품정보등록(DTO)</h2>
+    <form action="/file/upload_dto" method="post" enctype="multipart/form-data">
+        ID : <input name="id" /><br/>
+        CATEGORY : <input  name="category"/><br/>
+        PRICE : <input  name="price"/><br/>
+        FILE : <input type="file" name="files" multiple /> <br/>
+        <button>업로드[다중파일]</button>
+    </form>
+    <hr/>
+
+
+    <h2>상품정보등록(DTO)_With Axios</h2>
+    <form name="uploadForm" action="/file/upload_dto" onsubmit="return false" method="post" enctype="multipart/form-data">
+        ID : <input name="id" /><br/>
+        CATEGORY : <input  name="category"/><br/>
+        PRICE : <input  name="price"/><br/>
+        FILE : <input type="file" name="files" multiple /> <br/>
+        <button class="btn-upload-axios">업로드[다중파일]</button>
+    </form>
+    <!--Axios cdn -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.10.0/axios.min.js" integrity="sha512-WkZrEcQ5LMyNy6Y2PQf+Tu3vMcsmKKRKuPXtJSTHQJ3mpuvLRlA5dlDDhrrcXfyWr6Z/y3wIMfjfqVFO/gDZYQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        const btnUpload = document.querySelector('.btn-upload-axios')
+
+        btnUpload.addEventListener('click',()=>{
+            const form = document.uploadForm;
+            const formData = new FormData(form);
+            axios.post("/file/upload_dto_async",formData,{ headers:{"Content-Type":"multipart/form-data"} })
+            .then((resp)=>{ console.log(resp);})
+            .catch((err)=>{ console.log(err); })
+        })
+
+    </script>
+
+</body>
+</html>
