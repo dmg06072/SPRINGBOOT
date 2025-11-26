@@ -1,0 +1,9 @@
+*{
+    box-sizing:border-box;
+}
+
+form{
+    min-width : 500px;
+    min-height : 500px;
+    margin : 0 auto;
+}
